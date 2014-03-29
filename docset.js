@@ -4,26 +4,19 @@ var wd = fs.workingDirectory;
 
 var page = wp.create();
 
-page.onConsoleMessage = function (message) {
-	if (/^\[{/.test(message)) {
-		var toc = JSON.parse(message);
-		console.log(toc);
-	}
-}
-
 page.open("https://developers.google.com/maps/documentation/javascript/reference", function() {
 
 	// The page has jQuery loaded already.
-	page.evaluate(function() {
+	var content = page.evaluate(function() {
 
 		var title = $("title");
 		var heading = $("h1[itemprop=name]");
-		var content = $("div[itemprop=articleBody]");
+		var content = $("div[itemprop=articleBody]"); // This contains all interesting content.
 		$("#maps-topnav").remove(); // This unwanted node is present in the content.
 		$("link:not([href$='screen-docs.css'])").remove(); // We only need this stylesheet, so remove everything else.
 
-		var index = $("<div />").append(heading).attr("id", "index");
-		var reference = $("<div />").attr("id", "reference");
+		var index = $("<div />").append(heading).attr("id", "index"); // Content for the index.
+		var reference = $("<div />").attr("id", "reference"); // Content for the reference itself.
 		var toc = [];
 
 		var headings = 0;
@@ -47,7 +40,8 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 							// The p is followed by a ul that contains the links we're interested in.
 							items: $p.next().find("a").get().map(function (a) {
 								var hash = a.href.split("#")[1];
-								var def = $("#" + hash).text().trim().split("\n"); // 0 = name, 1 = type
+								// Pick up the target of the link. The first part is the name, the second part the type.
+								var def = $("#" + hash).text().trim().split("\n");
 
 								var type;
 								if (def[1] === "object specification") {
@@ -58,7 +52,6 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 
 								return {
 									name: def[0],
-									// Get the target of the link. Its text content ends with the type.
 									type: type,
 									path: "api.html#" + hash
 								};
@@ -90,23 +83,25 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 		style.html(css + "body {margin: 20px !important;}");
 
 		$(document.head).empty().append(title).append(style);
-		$(document.body).empty().append(index).append(reference);
+		$(document.body).empty().append(index);
 
-		console.info(JSON.stringify(toc));
+		var indexHtml = document.doctype + document.documentElement.outerHTML;
+
+		$(document.body).empty().append(reference);
+
+		var referenceHtml = document.doctype + document.documentElement.outerHTML;
+
+		return {
+			toc: toc,
+			index: indexHtml,
+			reference: referenceHtml
+		};
 	});
 
-	page.evaluate(function () {
-		window.reference = $("#reference").remove();
-	});
+	fs.write(wd + "/index.html", content.index, "w");
+	fs.write(wd + "/api.html", content.reference, "w");
 
-	fs.write(wd + "/index.html", page.content, "w");
-
-	page.evaluate(function () {
-		window.index = $("#index").remove();
-		$(document.body).append(window.reference);
-	});
-
-	fs.write(wd + "/api.html", page.content, "w");
+	console.info(JSON.stringify(content.toc));
 
 	phantom.exit();
 
