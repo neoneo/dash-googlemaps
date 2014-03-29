@@ -85,11 +85,11 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 		$(document.head).empty().append(title).append(style);
 		$(document.body).empty().append(index);
 
-		var indexHtml = document.doctype + document.documentElement.outerHTML;
+		var indexHtml = "<!DOCTYPE html>" + document.documentElement.outerHTML;
 
 		$(document.body).empty().append(reference);
 
-		var referenceHtml = document.doctype + document.documentElement.outerHTML;
+		var referenceHtml = "<!DOCTYPE html>" + document.documentElement.outerHTML;
 
 		return {
 			toc: toc,
