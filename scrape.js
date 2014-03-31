@@ -33,26 +33,42 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 				case 2:
 					// Second h2 marks the start of the toc.
 					if (this.tagName === "P") {
-						var $p = $(this);
 						// A p tag identifies a section.
+						var $p = $(this);
+						var title = $p.text();
+						// Create a Dash style anchor for the section. It will be inserted in the first item in this section.
+						var sectionAnchor = $("<a />").attr("name", "//dash_ref/DashTOCSection/" + $p.text() + "/0").addClass("dashAnchor");
+						var sectionInserted = false;
+
 						var section = {
-							title: $p.text(),
+							title: title,
 							// The p is followed by a ul that contains the links we're interested in.
 							items: $p.next().find("a").get().map(function (a) {
-								var hash = a.href.split("#")[1];
-								// Pick up the target of the link. The first part is the name, the second part the type.
-								var def = $("#" + hash).text().trim().split("\n");
+								// Pick up the target of the link.
+								var $target = $("#" + a.href.split("#")[1]);
+								// The first part of the text content is the name, the second part the type.
+								var def = $target.text().trim().split("\n");
 
-								var type;
+								// To keep overview, only take the last part of the name.
+								var type, name = def[0].split(".").pop();
 								if (def[1] === "object specification") {
 									type = /Event$/.test(def[0]) ? "Event" : "Object";
 								} else {
 									type = def[1][0].toUpperCase() + def[1].substr(1);
 								}
 
+								// Insert a Dash anchor for the entry.
+								var hash = "//dash_ref/" + type + "/" + name + "/1";
+								var anchor = $("<a />").attr("name", hash).addClass("dashAnchor");
+								$target.prepend(anchor);
+
+								if (!sectionInserted) {
+									$target.prepend(sectionAnchor);
+									sectionInserted = true;
+								}
+
 								return {
-									// To keep overview, only take the last part of the name.
-									name: def[0].split(".").pop(),
+									name: name,
 									type: type,
 									path: "api.html#" + hash
 								};
