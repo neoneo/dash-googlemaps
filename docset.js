@@ -10,7 +10,6 @@ exec("phantomjs " + __dirname + "/scrape.js", function (error, stdout, stderr) {
 	var toc = JSON.parse(stdout);
 	var db = new sqlite3.Database(process.cwd() + "/GoogleMaps.docset/Contents/Resources/docSet.dsidx", function (error) {
 
-
 		db.serialize(function () {
 			db.exec("CREATE TABLE searchIndex(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT);");
 			db.exec("CREATE UNIQUE INDEX anchor ON searchIndex (name, type, path);");
