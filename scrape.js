@@ -15,7 +15,6 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 		$("#maps-topnav").remove(); // This unwanted node is present in the content.
 		$("link:not([href$='screen-docs.css'])").remove(); // We only need this stylesheet, so remove everything else.
 
-		var index = $("<div />").append(heading).attr("id", "index"); // Content for the index.
 		var reference = $("<div />").attr("id", "reference"); // Content for the reference itself.
 		var toc = [];
 
@@ -28,7 +27,7 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 			switch (headings) {
 				case 1:
 					// First h2 starts the introduction.
-					index.append(this);
+					reference.append(this);
 					break;
 				case 2:
 					// Second h2 marks the start of the toc.
@@ -37,7 +36,7 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 						var $p = $(this);
 						var title = $p.text();
 						// Create a Dash style anchor for the section. It will be inserted in the first item in this section.
-						var sectionAnchor = $("<a />").attr("name", "//dash_ref/DashTOCSection/" + $p.text() + "/0").addClass("dashAnchor");
+						var sectionAnchor = $("<a />").attr("name", "//dash_ref/DashTOCSection/" + $p.text() + "/1").addClass("dashAnchor");
 						var sectionInserted = false;
 
 						var section = {
@@ -58,7 +57,7 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 								}
 
 								// Insert a Dash anchor for the entry.
-								var hash = "//dash_ref/" + type + "/" + name + "/1";
+								var hash = "//dash_ref/" + type + "/" + name + "/0";
 								var anchor = $("<a />").attr("name", hash).addClass("dashAnchor");
 								$target.prepend(anchor);
 
@@ -70,7 +69,7 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 								return {
 									name: name,
 									type: type,
-									path: "api.html#" + hash
+									path: "index.html#" + hash
 								};
 							})
 						};
@@ -99,17 +98,12 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 
 		var link = $("<link />").attr("rel", "stylesheet").attr("type", "text/css").attr("href", "style.css");
 		$(document.head).empty().append(title).append(link);
-		$(document.body).empty().append(index);
-
-		var indexHtml = "<!DOCTYPE html>" + document.documentElement.outerHTML;
-
 		$(document.body).empty().append(reference);
 
 		var referenceHtml = "<!DOCTYPE html>" + document.documentElement.outerHTML;
 
 		return {
 			toc: toc,
-			index: indexHtml,
 			reference: referenceHtml,
 			css: css
 		};
@@ -117,8 +111,7 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 
 	var dir = wd + "/GoogleMaps.docset/Contents/Resources/Documents";
 	fs.makeTree(dir);
-	fs.write(dir + "/index.html", content.index, "w");
-	fs.write(dir + "/api.html", content.reference, "w");
+	fs.write(dir + "/index.html", content.reference, "w");
 	fs.write(dir + "/style.css", content.css, "w");
 
 	// Return the toc to node.
