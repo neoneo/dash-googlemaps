@@ -97,14 +97,17 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 		}, "body {margin: 20px !important;}");
 
 		var link = $("<link />").attr("rel", "stylesheet").attr("type", "text/css").attr("href", "style.css");
-		$(document.head).empty().append(title).append(link);
+		var meta = $("meta[charset]");
+		$(document.head).empty().append(meta).append(title).append(link);
 		$(document.body).empty().append(reference);
-
-		var referenceHtml = "<!DOCTYPE html>" + document.documentElement.outerHTML;
+		// Fix any relative link that doesn't target an anchor.
+		$("a[href^='/']").each(function () {
+			this.href = this.href;
+		});
 
 		return {
 			toc: toc,
-			reference: referenceHtml,
+			reference: "<!DOCTYPE html>" + document.documentElement.outerHTML,
 			css: css
 		};
 	});
