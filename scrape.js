@@ -4,12 +4,11 @@ var wd = fs.workingDirectory;
 
 var page = wp.create();
 
-page.open("https://developers.google.com/maps/documentation/javascript/reference", function() {
+page.open("https://developers.google.com/maps/documentation/javascript/reference", function () {
 
 	// The page has jQuery loaded already.
 	var content = page.evaluate(function() {
 
-		var title = $("title");
 		var heading = $("h1[itemprop=name]");
 		var content = $("div[itemprop=articleBody]"); // This contains all interesting content.
 		$("#maps-topnav").remove(); // This unwanted node is present in the content.
@@ -44,7 +43,8 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 							// The p is followed by a ul that contains the links we're interested in.
 							items: $p.next().find("a").get().map(function (a) {
 								// Pick up the target of the link.
-								var $target = $("#" + a.href.split("#")[1]);
+								// jQuery doesn't find elements if the id contains a dot.
+								var $target = $(document.getElementById(a.href.split("#")[1]));
 								// The first part of the text content is the name, the second part the type.
 								var def = $target.text().trim().split("\n");
 
@@ -98,7 +98,7 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 
 		var link = $("<link />").attr("rel", "stylesheet").attr("type", "text/css").attr("href", "style.css");
 		var meta = $("meta[charset]");
-		$(document.head).empty().append(meta).append(title).append(link);
+		$(document.head).empty().append(meta).append($("<title />").text("Google Maps")).append(link);
 		$(document.body).empty().append(reference);
 		// Fix any relative link that doesn't target an anchor.
 		$("a[href^='/']").each(function () {
