@@ -52,6 +52,8 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 								var type, name = def[0].split(".").pop();
 								if (def[1] === "object specification") {
 									type = /Event$/.test(def[0]) ? "Event" : "Object";
+								} else if (def[1] === "typedef") {
+									type = "Type";
 								} else {
 									type = def[1][0].toUpperCase() + def[1].substr(1);
 								}
@@ -112,7 +114,7 @@ page.open("https://developers.google.com/maps/documentation/javascript/reference
 		};
 	});
 
-	var dir = wd + "/GoogleMaps.docset/Contents/Resources/Documents";
+	var dir = wd + "/Google_Maps.docset/Contents/Resources/Documents";
 	fs.makeTree(dir);
 	fs.write(dir + "/index.html", content.reference, "w");
 	fs.write(dir + "/style.css", content.css, "w");
